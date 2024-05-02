@@ -19,7 +19,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.RobotConstants;
 
 public class Intake extends SubsystemBase implements Logged{
-    @Log private double target = 0;
+    @Log private double setpoint = 0;
     @Log private double velocity = 0;
     @Log private double appliedVoltage = 0;
     @Log private double current = 0;
@@ -52,7 +52,7 @@ public class Intake extends SubsystemBase implements Logged{
 
     @Override
     public void periodic() {
-        realController.setReference(target, ControlType.kVelocity);
+        realController.setReference(setpoint, ControlType.kVelocity);
 
         velocity = encoder.getVelocity();
         appliedVoltage = motor.getAppliedOutput() * motor.getBusVoltage();
@@ -65,12 +65,12 @@ public class Intake extends SubsystemBase implements Logged{
 
         current = simMotor.getCurrentDrawAmps();
         velocity = simMotor.getAngularVelocityRPM();
-        appliedVoltage = simPID.calculate(velocity, target) + simFF.calculate(target);
+        appliedVoltage = simPID.calculate(velocity, setpoint) + simFF.calculate(setpoint);
 
         simMotor.setInputVoltage(appliedVoltage);
     }
 
-    public void setVelocity(Measure<Velocity<Angle>> target) {
-        this.target = target.in(RPM);
+    public void setVelocity(Measure<Velocity<Angle>> setpoint) {
+        this.setpoint = setpoint.in(RPM);
     }
 }

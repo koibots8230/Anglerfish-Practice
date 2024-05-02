@@ -19,8 +19,8 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.RobotConstants;
 
 public class Shooter extends SubsystemBase implements Logged{
-    @Log private double topTarget = 0;
-    @Log private double bottomTarget = 0;
+    @Log private double topSetpoint = 0;
+    @Log private double bottomSetpoint = 0;
 
     @Log private double topVelocity = 0;
     @Log private double bottomVelocity = 0;
@@ -79,8 +79,8 @@ public class Shooter extends SubsystemBase implements Logged{
 
     @Override
     public void periodic() {
-        topController.setReference(topTarget, ControlType.kVelocity);
-        bottomController.setReference(bottomTarget, ControlType.kVelocity);
+        topController.setReference(topSetpoint, ControlType.kVelocity);
+        bottomController.setReference(bottomSetpoint, ControlType.kVelocity);
 
         topVelocity = topEncoder.getVelocity();
         bottomVelocity = bottomEncoder.getVelocity();
@@ -103,15 +103,15 @@ public class Shooter extends SubsystemBase implements Logged{
         topVelocity = topMotorSim.getAngularVelocityRPM();
         bottomVelocity = bottomMotorSim.getAngularVelocityRPM();
 
-        topAppliedVoltage = topSimPID.calculate(topVelocity, topTarget) + topSimFF.calculate(topTarget);
-        bottomAppliedVoltage = bottomSimPID.calculate(bottomVelocity, bottomTarget) + bottomSimFF.calculate(bottomTarget);
+        topAppliedVoltage = topSimPID.calculate(topVelocity, topSetpoint) + topSimFF.calculate(topSetpoint);
+        bottomAppliedVoltage = bottomSimPID.calculate(bottomVelocity, bottomSetpoint) + bottomSimFF.calculate(bottomSetpoint);
 
         topMotorSim.setInputVoltage(topAppliedVoltage);
         bottomMotorSim.setInputVoltage(bottomAppliedVoltage);
     }
 
-    public void setVelocity(Measure<Velocity<Angle>> topTarget, Measure<Velocity<Angle>> bottomTarget){
-        this.topTarget = topTarget.in(RPM);
-        this.bottomTarget = bottomTarget.in(RPM);
+    public void setVelocity(Measure<Velocity<Angle>> topSetpoint, Measure<Velocity<Angle>> bottomSetpoint){
+        this.topSetpoint = topSetpoint.in(RPM);
+        this.bottomSetpoint = bottomSetpoint.in(RPM);
     }
 }
