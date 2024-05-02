@@ -17,7 +17,6 @@ import monologue.Annotations.*;
 import monologue.Logged;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.RobotConstants;
-import frc.robot.Robot;
 
 public class Shooter extends SubsystemBase implements Logged{
     @Log private double topTarget = 0;
@@ -49,8 +48,11 @@ public class Shooter extends SubsystemBase implements Logged{
     private SimpleMotorFeedforward topSimFF;
     private SimpleMotorFeedforward bottomSimFF;
 
-    public Shooter() {
-        if(Robot.isReal()) {
+    private boolean isReal;
+
+    public Shooter(boolean isReal) {
+        this.isReal = isReal;
+        if(this.isReal) {
             topMotor = new CANSparkMax(ShooterConstants.TOP_ID, MotorType.kBrushless);
             bottomMotor = new CANSparkMax(ShooterConstants.BOTTOM_ID, MotorType.kBrushless);
 
@@ -59,19 +61,19 @@ public class Shooter extends SubsystemBase implements Logged{
             topEncoder = topMotor.getEncoder();
             bottomEncoder = bottomMotor.getEncoder();
 
-            topController.setP(ShooterConstants.TopShooterPID.REAL_KP);
-            bottomController.setP(ShooterConstants.BottomShooterPID.REAL_KP);
-            topController.setFF(ShooterConstants.TopShooterFF.REAL_KV);
-            bottomController.setFF(ShooterConstants.BottomShooterFF.REAL_KV);
+            topController.setP(ShooterConstants.TOP_PID.kP);
+            bottomController.setP(ShooterConstants.BOTTOM_PID.kP);
+            topController.setFF(ShooterConstants.TOP_FF.kV);
+            bottomController.setFF(ShooterConstants.BOTTOM_FF.kV);
         } else {
             topMotorSim = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
             bottomMotorSim = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
 
-            topSimPID = new PIDController(ShooterConstants.TopShooterPID.SIM_KP, ShooterConstants.TopShooterPID.SIM_KI, ShooterConstants.TopShooterPID.SIM_KD);
-            bottomSimPID = new PIDController(ShooterConstants.BottomShooterPID.SIM_KP, ShooterConstants.BottomShooterPID.SIM_KI, ShooterConstants.BottomShooterPID.SIM_KD);
+            topSimPID = new PIDController(ShooterConstants.TOP_PID.kP, ShooterConstants.TOP_PID.kI, ShooterConstants.TOP_PID.kD);
+            bottomSimPID = new PIDController(ShooterConstants.BOTTOM_PID.kP, ShooterConstants.BOTTOM_PID.kI, ShooterConstants.BOTTOM_PID.kD);
 
-            topSimFF = new SimpleMotorFeedforward(ShooterConstants.TopShooterFF.SIM_KS, ShooterConstants.TopShooterFF.SIM_KV, ShooterConstants.TopShooterFF.SIM_KA);
-            bottomSimFF = new SimpleMotorFeedforward(ShooterConstants.BottomShooterFF.SIM_KS, ShooterConstants.BottomShooterFF.SIM_KV, ShooterConstants.BottomShooterFF.SIM_KA);
+            topSimFF = new SimpleMotorFeedforward(ShooterConstants.TOP_FF.kS, ShooterConstants.TOP_FF.kV, ShooterConstants.TOP_FF.kA);
+            bottomSimFF = new SimpleMotorFeedforward(ShooterConstants.BOTTOM_FF.kS, ShooterConstants.BOTTOM_FF.kV, ShooterConstants.BOTTOM_FF.kA);
         }
     }
 

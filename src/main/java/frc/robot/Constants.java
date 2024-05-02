@@ -3,6 +3,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.*;
+import frc.lib.util.FFClass;
+import frc.lib.util.PIDClass;
 
 public class Constants {
     public static class ShooterConstants {
@@ -11,44 +13,28 @@ public class Constants {
         public static final Measure<Velocity<Angle>> TOP_SPEAKER_SPEED = RPM.of(0);
         public static final Measure<Velocity<Angle>> BOTTOM_SPEAKER_SPEED = RPM.of(0);
 
-        public static class TopShooterPID {
-            public static final double REAL_KP = 0;
-            public static final double REAL_KI = 0;
-            public static final double REAL_KD = 0;
-            public static final double SIM_KP = 0;
-            public static final double SIM_KI = 0;
-            public static final double SIM_KD = 0;
-        }
+        public static final PIDClass TOP_PID = new PIDClass(0, 0, 0, 0, 0, 0);
+        public static final PIDClass BOTTOM_PID = new PIDClass(0, 0, 0, 0, 0, 0);
 
-        public static class BottomShooterPID {
-            public static final double REAL_KP = 0;
-            public static final double REAL_KI = 0;
-            public static final double REAL_KD = 0;
-            public static final double SIM_KP = 0;
-            public static final double SIM_KI = 0;
-            public static final double SIM_KD = 0;
-        }
-
-        public static class TopShooterFF {
-            public static final double REAL_KS = 0;
-            public static final double REAL_KV = 0;
-            public static final double REAL_KA = 0;
-            public static final double SIM_KS = 0;
-            public static final double SIM_KV = 0;
-            public static final double SIM_KA = 0;
-        }
-
-        public static class BottomShooterFF {
-            public static final double REAL_KS = 0;
-            public static final double REAL_KV = 0;
-            public static final double REAL_KA = 0;
-            public static final double SIM_KS = 0;
-            public static final double SIM_KV = 0;
-            public static final double SIM_KA = 0;
-        }
+        public static final FFClass TOP_FF = new FFClass(0, 0, 0, 0, 0, 0, 0, 0);
+        public static final FFClass BOTTOM_FF = new FFClass(0, 0, 0, 0, 0, 0, 0, 0);
 
         public static final int TOP_ID = 11;
         public static final int BOTTOM_ID = 13;
+    }
+
+    public static class IntakeConstants {
+        public static final PIDClass PID = new PIDClass(0, 0, 0, 0, 0, 0);
+        public static final FFClass FF = new FFClass(0, 0, 0, 0, 0, 0, 0, 0);
+
+        public static final int ID = 14;
+    }
+
+    public static class IndexerConstants {
+        public static final PIDClass PID = new PIDClass(0, 0, 0, 0, 0, 0);
+        public static final FFClass FF = new FFClass(0, 0, 0, 0, 0, 0, 0, 0);
+
+        public static final int ID = 9;
     }
 
     public static class RobotConstants {
