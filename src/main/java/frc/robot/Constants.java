@@ -24,13 +24,9 @@ public final class Constants {
 
     public static class MotorDefinitions {
 
-        public static MotorDefinition topShooter = new MotorDefinition(0.0, 0.0, 0.0,0.0);
+        public static MotorDefinition topShooter = new MotorDefinition(0.00005, 0.0, 0.0,0.000188 );
 
-        public static MotorDefinition bottomShooter = new MotorDefinition(0.0, 0.0,0.0,0.0);
-
-
-
-
+        public static MotorDefinition bottomShooter = new MotorDefinition(0.00018, 0.0,0.0,0.000028);
     }
 
     public static class PIDConstants {

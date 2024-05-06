@@ -57,8 +57,8 @@ public class Shooter extends SubsystemBase implements Logged {
     public Shooter(boolean isReal) {
         this.isReal = isReal;
         if (isReal) {
-            topMotor = new CANSparkMax(3, CANSparkLowLevel.MotorType.kBrushless);
-            bottomMotor = new CANSparkMax(4, CANSparkLowLevel.MotorType.kBrushless);
+            topMotor = new CANSparkMax(11, CANSparkLowLevel.MotorType.kBrushless);
+            bottomMotor = new CANSparkMax(13, CANSparkLowLevel.MotorType.kBrushless);
 
 
             topShoterPID = topMotor.getPIDController();
@@ -100,7 +100,12 @@ public class Shooter extends SubsystemBase implements Logged {
         if(isReal){
             topShoterPID.setReference(topShooterSetpoint, CANSparkBase.ControlType.kVelocity);
             bottomShoterPID.setReference(bottomShooterSetpoint, CANSparkBase.ControlType.kVelocity);
-
+            topShoterVelocity=topEncoder.getVelocity();
+            bottomShoterVelocity=bottomEncoder.getVelocity();
+            topAppliedVoltage=topMotor.getAppliedOutput()*topMotor.getBusVoltage();
+            bottomAppliedVoltage=bottomMotor.getAppliedOutput()*bottomMotor.getBusVoltage();
+            topshoterCurrent=topMotor.getOutputCurrent();
+            bottomShoterCurrent=bottomMotor.getOutputCurrent();
         }
     }
 
