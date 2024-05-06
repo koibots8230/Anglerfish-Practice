@@ -6,6 +6,13 @@
       "/Robot/shooterSubsystem/topSimPID": "PIDController"
     }
   },
+  "NetworkTables": {
+    "transitory": {
+      "Robot": {
+        "open": true
+      }
+    }
+  },
   "NetworkTables Info": {
     "Server": {
       "open": true

@@ -19,21 +19,17 @@ public class Shooter extends SubsystemBase implements Logged {
 
     private DCMotorSim topSimMotor;
     private DCMotorSim bottomSimMotor;
-    @Log
     private RelativeEncoder topEncoder;
-    @Log
     private RelativeEncoder bottomEncoder;
-    @Log
     private SparkPIDController topShoterPID;
-    @Log
     private SparkPIDController bottomShoterPID;
-    @Log
+
     private SimpleMotorFeedforward topSimFF;
-    @Log
+
     private SimpleMotorFeedforward bottomSimFF;
-    @Log
+
     private PIDController topSimPID;
-    @Log
+
     private PIDController bottomSimPID;
 
     private final boolean isReal;
@@ -60,7 +56,7 @@ public class Shooter extends SubsystemBase implements Logged {
 
     public Shooter(boolean isReal) {
         this.isReal = isReal;
-        if (Robot.isReal()) {
+        if (isReal) {
             topMotor = new CANSparkMax(3, CANSparkLowLevel.MotorType.kBrushless);
             bottomMotor = new CANSparkMax(4, CANSparkLowLevel.MotorType.kBrushless);
 
@@ -88,11 +84,11 @@ public class Shooter extends SubsystemBase implements Logged {
             topSimMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
             bottomSimMotor = new DCMotorSim(DCMotor.getNEO(1),1,1);
 
-            topSimFF = new SimpleMotorFeedforward(0.002,0.002);
-            bottomSimFF = new SimpleMotorFeedforward(0.002,0.002);
+            topSimFF = new SimpleMotorFeedforward(0.0,0.0021);
+            bottomSimFF = new SimpleMotorFeedforward(0.0,0.0021);
 
-            topSimPID = new PIDController(0.002,0.002,0.002);
-            bottomSimPID = new PIDController(0.002, 0.002, 0.002);
+            topSimPID = new PIDController(0.08,0.0,0.00);
+            bottomSimPID = new PIDController(0.08, 0.0, 0.00);
 
         }
 
@@ -102,16 +98,16 @@ public class Shooter extends SubsystemBase implements Logged {
     @Override
     public void periodic(){
         if(isReal){
-            topShoterPID.setReference(topShoterVelocity, CANSparkBase.ControlType.kVelocity);
-            bottomShoterPID.setReference(bottomShoterVelocity, CANSparkBase.ControlType.kVelocity);
+            topShoterPID.setReference(topShooterSetpoint, CANSparkBase.ControlType.kVelocity);
+            bottomShoterPID.setReference(bottomShooterSetpoint, CANSparkBase.ControlType.kVelocity);
 
         }
     }
 
     @Override
     public void simulationPeriodic(){
-        topSimMotor.update(.2);
-        bottomSimMotor.update(.2);
+        topSimMotor.update(.02);
+        bottomSimMotor.update(.02);
 
         topshoterCurrent = topSimMotor.getCurrentDrawAmps();
         topShoterVelocity = topSimMotor.getAngularVelocityRPM();
