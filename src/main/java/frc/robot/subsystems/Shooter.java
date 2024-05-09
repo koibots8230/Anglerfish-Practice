@@ -56,7 +56,7 @@ public class Shooter extends SubsystemBase implements Logged {
 
     public Shooter(boolean isReal) {
         this.isReal = isReal;
-        if (isReal) {
+        if (this.isReal) {
             topMotor = new CANSparkMax(11, CANSparkLowLevel.MotorType.kBrushless);
             bottomMotor = new CANSparkMax(13, CANSparkLowLevel.MotorType.kBrushless);
 
@@ -97,7 +97,7 @@ public class Shooter extends SubsystemBase implements Logged {
 
     @Override
     public void periodic(){
-        if(isReal){
+        if(this.isReal){
             topShoterPID.setReference(topShooterSetpoint, CANSparkBase.ControlType.kVelocity);
             bottomShoterPID.setReference(bottomShooterSetpoint, CANSparkBase.ControlType.kVelocity);
             topShoterVelocity=topEncoder.getVelocity();

@@ -71,7 +71,7 @@ public class RobotContainer implements Logged {
                 new InstantCommand(() -> shooterSubsystem.setVelocity(0.0,
                         0.0), shooterSubsystem)));
 
-        Trigger sendToShooterTrigger = new Trigger(() -> controller.OPERATOR_CONTROLLER.getRawButton(6) &&
+        Trigger sendToShooterTrigger = new Trigger(() -> controller.CONTROLLER.getRawButton(2) &&
                 shooterSubsystem.checkVelocity());
         sendToShooterTrigger.onTrue(new ParallelCommandGroup(
                 new InstantCommand(() -> indexerSubsystem.setIndexerVelocity(PIDConstants.SEND_TO_SHOOTER_SETPOINT),
