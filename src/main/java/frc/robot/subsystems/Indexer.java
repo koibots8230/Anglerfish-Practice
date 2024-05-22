@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.*;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import monologue.Annotations.*;
 import monologue.Logged;
@@ -23,6 +24,7 @@ public class Indexer extends SubsystemBase implements Logged{
     @Log private double velocity = 0;
     @Log private double appliedVoltage = 0;
     @Log private double current = 0;
+    @Log private boolean noteInIndexer;
 
     private SparkPIDController realController;
     private PIDController simPID;
@@ -34,6 +36,8 @@ public class Indexer extends SubsystemBase implements Logged{
 
     private boolean isReal;
 
+    private DigitalInput indexerNoteDetector;
+
     public Indexer(boolean isReal) {
         this.isReal = isReal;
         if(this.isReal) {
@@ -43,6 +47,9 @@ public class Indexer extends SubsystemBase implements Logged{
             realController = motor.getPIDController();
             realController.setP(IndexerConstants.PID.kP);
             realController.setFF(IndexerConstants.FF.kV);
+
+            indexerNoteDetector = new DigitalInput(0);
+            noteInIndexer = indexerNoteDetector.get();
         } else {
             simMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
             simPID = new PIDController(IndexerConstants.PID.kP, IndexerConstants.PID.kI, IndexerConstants.PID.kD);
@@ -57,6 +64,7 @@ public class Indexer extends SubsystemBase implements Logged{
         velocity = encoder.getVelocity();
         appliedVoltage = motor.getAppliedOutput() * motor.getBusVoltage();
         current = motor.getOutputCurrent();
+        noteInIndexer = indexerNoteDetector.get();
     }
 
     @Override
@@ -72,5 +80,9 @@ public class Indexer extends SubsystemBase implements Logged{
 
     public void setVelocity(Measure<Velocity<Angle>> setpoint) {
         this.setpoint = setpoint.in(RPM);
+    }
+
+    public boolean checkForNote() {
+        return noteInIndexer;
     }
 }

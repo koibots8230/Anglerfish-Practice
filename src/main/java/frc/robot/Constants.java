@@ -24,6 +24,7 @@ public class Constants {
     }
 
     public static class IntakeConstants {
+        public static final Measure<Velocity<Angle>> SPEED = RPM.of(0);
         public static final PIDClass PID = new PIDClass(0, 0, 0, 0, 0, 0);
         public static final FFClass FF = new FFClass(0, 0, 0, 0, 0, 0, 0, 0);
 
