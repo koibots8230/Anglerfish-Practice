@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.PIDConstants;
-import frc.robot.Robot;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -40,11 +39,11 @@ public class Shooter extends SubsystemBase implements Logged {
     private double bottomShoterVelocity;
 
     @Log
-    private double  bottomShoterCurrent;
+    private double bottomShoterCurrent;
     @Log
-    private double  topshoterCurrent;
+    private double topshoterCurrent;
     @Log
-    private double  topAppliedVoltage;
+    private double topAppliedVoltage;
     @Log
     private double bottomAppliedVoltage;
     @Log
@@ -52,14 +51,11 @@ public class Shooter extends SubsystemBase implements Logged {
     @Log
     private double bottomShooterSetpoint;
 
-
-
     public Shooter(boolean isReal) {
         this.isReal = isReal;
         if (this.isReal) {
             topMotor = new CANSparkMax(11, CANSparkLowLevel.MotorType.kBrushless);
             bottomMotor = new CANSparkMax(13, CANSparkLowLevel.MotorType.kBrushless);
-
 
             topShoterPID = topMotor.getPIDController();
 
@@ -82,35 +78,34 @@ public class Shooter extends SubsystemBase implements Logged {
 
         else {
             topSimMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
-            bottomSimMotor = new DCMotorSim(DCMotor.getNEO(1),1,1);
+            bottomSimMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
 
-            topSimFF = new SimpleMotorFeedforward(0.0,0.0021);
-            bottomSimFF = new SimpleMotorFeedforward(0.0,0.0021);
+            topSimFF = new SimpleMotorFeedforward(0.0, 0.0021);
+            bottomSimFF = new SimpleMotorFeedforward(0.0, 0.0021);
 
-            topSimPID = new PIDController(0.08,0.0,0.00);
+            topSimPID = new PIDController(0.08, 0.0, 0.00);
             bottomSimPID = new PIDController(0.08, 0.0, 0.00);
 
         }
 
-
     }
 
     @Override
-    public void periodic(){
-        if(this.isReal){
+    public void periodic() {
+        if (this.isReal) {
             topShoterPID.setReference(topShooterSetpoint, CANSparkBase.ControlType.kVelocity);
             bottomShoterPID.setReference(bottomShooterSetpoint, CANSparkBase.ControlType.kVelocity);
-            topShoterVelocity=topEncoder.getVelocity();
-            bottomShoterVelocity=bottomEncoder.getVelocity();
-            topAppliedVoltage=topMotor.getAppliedOutput()*topMotor.getBusVoltage();
-            bottomAppliedVoltage=bottomMotor.getAppliedOutput()*bottomMotor.getBusVoltage();
-            topshoterCurrent=topMotor.getOutputCurrent();
-            bottomShoterCurrent=bottomMotor.getOutputCurrent();
+            topShoterVelocity = topEncoder.getVelocity();
+            bottomShoterVelocity = bottomEncoder.getVelocity();
+            topAppliedVoltage = topMotor.getAppliedOutput() * topMotor.getBusVoltage();
+            bottomAppliedVoltage = bottomMotor.getAppliedOutput() * bottomMotor.getBusVoltage();
+            topshoterCurrent = topMotor.getOutputCurrent();
+            bottomShoterCurrent = bottomMotor.getOutputCurrent();
         }
     }
 
     @Override
-    public void simulationPeriodic(){
+    public void simulationPeriodic() {
         topSimMotor.update(.02);
         bottomSimMotor.update(.02);
 
@@ -120,9 +115,10 @@ public class Shooter extends SubsystemBase implements Logged {
         bottomShoterVelocity = bottomSimMotor.getAngularVelocityRPM();
         bottomShoterCurrent = bottomSimMotor.getCurrentDrawAmps();
 
-        topAppliedVoltage =
-                topSimPID.calculate(topShoterVelocity, topShooterSetpoint) + topSimFF.calculate(topShooterSetpoint);
-        bottomAppliedVoltage = bottomSimPID.calculate(bottomShoterVelocity, bottomShooterSetpoint) + bottomSimFF.calculate(bottomShooterSetpoint);
+        topAppliedVoltage = topSimPID.calculate(topShoterVelocity, topShooterSetpoint)
+                + topSimFF.calculate(topShooterSetpoint);
+        bottomAppliedVoltage = bottomSimPID.calculate(bottomShoterVelocity, bottomShooterSetpoint)
+                + bottomSimFF.calculate(bottomShooterSetpoint);
 
         topSimMotor.setInputVoltage(topAppliedVoltage);
         bottomSimMotor.setInputVoltage(bottomAppliedVoltage);
@@ -134,14 +130,18 @@ public class Shooter extends SubsystemBase implements Logged {
     }
 
     public boolean checkVelocity() {
-        return Math.abs(topEncoder.getVelocity() - PIDConstants.TOP_SHOOTER_AMP_SETPOINT) <= PIDConstants.TOP_SHOOTER_VELOCITY_RANGE_AMP
+        return Math
+                .abs(topEncoder.getVelocity()
+                        - PIDConstants.TOP_SHOOTER_AMP_SETPOINT) <= PIDConstants.TOP_SHOOTER_VELOCITY_RANGE_AMP
                 &&
-                Math.abs(bottomEncoder.getVelocity() - PIDConstants.BOTTOM_SHOOTER_AMP_SETPOINT) <= PIDConstants.BOTTOM_SHOOTER_VELOCITY_RANGE_AMP
+                Math.abs(bottomEncoder.getVelocity()
+                        - PIDConstants.BOTTOM_SHOOTER_AMP_SETPOINT) <= PIDConstants.BOTTOM_SHOOTER_VELOCITY_RANGE_AMP
                 ||
-                Math.abs(topEncoder.getVelocity() - PIDConstants.TOP_SHOOTER_SPEAKER_SETPOINT) <= PIDConstants.TOP_SHOOTER_VELOCITY_RANGE_AMP
+                Math.abs(topEncoder.getVelocity()
+                        - PIDConstants.TOP_SHOOTER_SPEAKER_SETPOINT) <= PIDConstants.TOP_SHOOTER_VELOCITY_RANGE_AMP
                         &&
-                        Math.abs(bottomEncoder.getVelocity() - PIDConstants.BOTTOM_SHOOTER_SPEAKER_SETPOINT) <= PIDConstants.BOTTOM_SHOOTER_VELOCITY_RANGE_AMP;
+                        Math.abs(bottomEncoder.getVelocity()
+                                - PIDConstants.BOTTOM_SHOOTER_SPEAKER_SETPOINT) <= PIDConstants.BOTTOM_SHOOTER_VELOCITY_RANGE_AMP;
     }
-
 
 }

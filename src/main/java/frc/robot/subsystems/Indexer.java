@@ -18,11 +18,11 @@ import monologue.Annotations.Log;
 
 public class Indexer extends SubsystemBase implements Logged {
 
-    @Log
+    
     private DigitalInput indexerDigitalInput;
 
     private CANSparkMax indexerMotor;
-    @Log
+    
     private SparkPIDController indexerPID;
 
     private boolean isReal;

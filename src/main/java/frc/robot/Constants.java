@@ -48,7 +48,7 @@ public final class Constants {
 
         public static final double INDEXER_FEEDFORWARD_FF = 0.0;
 
-        public static final double INDEXER_SETPOINT = 0.0;
+        public static final double INDEXER_SETPOINT = 400;
 
         // ----------shooter----------//
 
@@ -64,7 +64,7 @@ public final class Constants {
         public static final double BOTTOM_SHOOTER_VELOCITY_RANGE_AMP = 20;
 
 
-        public static final double SEND_TO_SHOOTER_SETPOINT = 0.0;
+        public static final double SEND_TO_SHOOTER_SETPOINT = 800;
 
 
     }
