@@ -126,9 +126,9 @@ class SwerveModule {
         turnVelocity = turnSimMotor.getAngularVelocityRPM();
         turnCurrent = turnSimMotor.getCurrentDrawAmps();
 
-        driveAppliedVoltage = driveMotorPID.calculate(driveVelocity, state.speedMetersPerSecond)
+        driveAppliedVoltage = driveSimPID.calculate(driveVelocity, state.speedMetersPerSecond)
                 + driveSimFF.calculate(state.speedMetersPerSecond);
-        turnAppliedVoltage = turnMotorPID.calculate(turnVelocity, state.speedMetersPerSecond)
+        turnAppliedVoltage = turnSimPID.calculate(turnVelocity, state.speedMetersPerSecond)
                 + turnSimFF.calculate(state.speedMetersPerSecond);
 
         driveSimMotor.setInputVoltage(driveAppliedVoltage);
