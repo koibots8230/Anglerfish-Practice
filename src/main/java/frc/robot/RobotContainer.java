@@ -8,9 +8,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.PIDConstants;
 import frc.robot.Constants.controller;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.SwerveCommand;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Swerve;
 import monologue.Monologue;
 import monologue.Logged;
 import monologue.Monologue;
@@ -20,8 +22,10 @@ public class RobotContainer implements Logged {
         private final Shooter shooterSubsystem;
         private final Intake intakeSubsystem;
         private final Indexer indexerSubsystem;
+        private final Swerve swerveSubsystem;
 
         private final IntakeCommand intakeCommand;
+        private final SwerveCommand swerveCommand;
 
         Trigger speakerShooterTrigger;
 
@@ -29,12 +33,18 @@ public class RobotContainer implements Logged {
                 shooterSubsystem = new Shooter(isReal);
                 intakeSubsystem = new Intake(isReal);
                 indexerSubsystem = new Indexer(isReal);
+                swerveSubsystem = new Swerve(isReal);
 
                 intakeCommand = new IntakeCommand(indexerSubsystem, intakeSubsystem);
+                swerveCommand = new SwerveCommand(0.0, 0.0, 0.0, 0.0, swerveSubsystem);
+                
 
                 Monologue.setupMonologue(
                                 this, "Robot", Constants.LoggerConstants.FILEONLY,
                                 Constants.LoggerConstants.LAZYLOGGING);
+                
+                swerveSubsystem.setDefaultCommand(new SwerveCommand(controller.CONTROLLER.getLeftX(), controller.CONTROLLER.getLeftY(), controller.CONTROLLER.getRightX(), controller.CONTROLLER.getRightY(), swerveSubsystem));
+
                 configureBindings();
         }
 
@@ -90,6 +100,7 @@ public class RobotContainer implements Logged {
                                                                 PIDConstants.SEND_TO_SHOOTER_SETPOINT),
                                                 indexerSubsystem)));
                 sendToShooterTrigger.onFalse(new InstantCommand(() -> indexerSubsystem.setIndexerVelocity(0.0)));
+
         }
 
 }

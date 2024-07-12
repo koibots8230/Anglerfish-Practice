@@ -1,9 +1,19 @@
 package frc.robot;
 
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import static edu.wpi.first.units.Units.*;
 
-public final class Constants {
+
+public final class Constants {  
+
+    public static final class RobotConstants{
+
+        public static final Measure<Distance> ROBOT_WIDTH = Inches.of(21.375);
+        public static final Measure<Distance> ROBOT_LENGTH = Inches.of(21.375);
+    }
 
     public static class MotorDefinition{
         public double P;
@@ -50,7 +60,7 @@ public final class Constants {
 
         public static final double INDEXER_SETPOINT = 400;
 
-        // ----------shooter----------//
+        // ----------shooter---------- //
 
 
         public static final double TOP_SHOOTER_SPEAKER_SETPOINT = -1000; // should be negitive
@@ -65,6 +75,11 @@ public final class Constants {
 
 
         public static final double SEND_TO_SHOOTER_SETPOINT = 800;
+
+        // ----------Swerve---------- //
+
+        public static final double ANGLE_FEED_FORWARD_SETPOINT = 0;
+        public static final double SPEED_FEED_FORWARD_SETPOINT = 0;
 
 
     }
@@ -87,5 +102,6 @@ public final class Constants {
         public static final boolean FILEONLY = false;
         public static final boolean LAZYLOGGING = false;
     }
+
 
 }
