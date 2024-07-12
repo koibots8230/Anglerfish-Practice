@@ -37,6 +37,10 @@ public final class Constants {
         public static MotorDefinition topShooter = new MotorDefinition(0.00005, 0.0, 0.0,0.000188 );
 
         public static MotorDefinition bottomShooter = new MotorDefinition(0.00018, 0.0,0.0,0.000028);
+
+        public static MotorDefinition driveMotor = new MotorDefinition(0.0, 0.0, 0.0, 0.0);
+
+        public static MotorDefinition turnMotor = new MotorDefinition(0, 0, 0, 0);
     }
 
     public static class PIDConstants {
@@ -85,7 +89,23 @@ public final class Constants {
     }
 
     public static class MotorConstants {
-        public static final int INTAKE_MOTOR_PORT = 1;
+        
+        public static final int BACK_LEFT_TURN = 5;
+        public static final int BACK_LEFT_DRIVE = 4;
+        public static final int FRONT_RIGHT_DRIVE = 7;
+        public static final int FRONT_RIGHT_TURN = 8;
+        public static final int BACK_RIGHT_DRIVE = 2;
+        public static final int BACK_RIGHT_TURN = 3;
+        public static final int FRONT_LEFT_DRIVE = 6;
+        public static final int FRONT_LEFT_TURN = 1;
+        public static final int INDEXER = 9;
+        public static final int SHOOTER_TOP = 11;
+        public static final int SHOOTER_BOTTOM = 13;
+        public static final int INTAKE = 14;
+
+        private static final int DRIVING_PINION_TEETH = 13;
+        public static final double DRIVE_GEAR_RATIO = (45.0 * 22) / (DRIVING_PINION_TEETH * 15);
+        public static final double TURN_GEAR_RATIO = (62.0 / 14) * 12;
 
 
     }

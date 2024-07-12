@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -25,7 +26,6 @@ public class RobotContainer implements Logged {
         private final Swerve swerveSubsystem;
 
         private final IntakeCommand intakeCommand;
-        private final SwerveCommand swerveCommand;
 
         Trigger speakerShooterTrigger;
 
@@ -36,14 +36,18 @@ public class RobotContainer implements Logged {
                 swerveSubsystem = new Swerve(isReal);
 
                 intakeCommand = new IntakeCommand(indexerSubsystem, intakeSubsystem);
-                swerveCommand = new SwerveCommand(0.0, 0.0, 0.0, 0.0, swerveSubsystem);
                 
 
                 Monologue.setupMonologue(
                                 this, "Robot", Constants.LoggerConstants.FILEONLY,
                                 Constants.LoggerConstants.LAZYLOGGING);
                 
-                swerveSubsystem.setDefaultCommand(new SwerveCommand(controller.CONTROLLER.getLeftX(), controller.CONTROLLER.getLeftY(), controller.CONTROLLER.getRightX(), controller.CONTROLLER.getRightY(), swerveSubsystem));
+                swerveSubsystem.setDefaultCommand(new SwerveCommand(
+                        () -> controller.CONTROLLER.getLeftX(),
+                        () -> controller.CONTROLLER.getLeftY(), 
+                        () -> controller.CONTROLLER.getRightX(),
+                        () -> controller.CONTROLLER.getRightY(), 
+                        swerveSubsystem));
 
                 configureBindings();
         }

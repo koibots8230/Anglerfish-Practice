@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
     private RelativeEncoder encoder;
 
     public Intake(boolean isReal) {
-        IntakeMotor = new CANSparkMax(MotorConstants.INTAKE_MOTOR_PORT, MotorType.kBrushless);
+        IntakeMotor = new CANSparkMax(MotorConstants.INTAKE, MotorType.kBrushless);
         intakeDigitalInput = new DigitalInput(1);
 
         pidController = IntakeMotor.getPIDController();
