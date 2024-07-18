@@ -45,8 +45,7 @@ public class RobotContainer implements Logged {
                 swerveSubsystem.setDefaultCommand(new SwerveCommand(
                         () -> controller.CONTROLLER.getLeftX(),
                         () -> controller.CONTROLLER.getLeftY(), 
-                        () -> controller.CONTROLLER.getRightX(),
-                        () -> controller.CONTROLLER.getRightY(), 
+                        () -> controller.CONTROLLER.getRightX(), 
                         swerveSubsystem));
 
                 configureBindings();

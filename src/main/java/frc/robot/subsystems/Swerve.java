@@ -1,45 +1,38 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.PIDConstants;
+import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.RobotConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
-
-import java.util.function.DoubleSupplier;
-
-import javax.print.URIException;
-import javax.swing.text.StyledEditorKit.BoldAction;
-
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.PIDConstants;
 import frc.robot.Constants;
-import frc.robot.Constants.MotorConstants;
-import frc.robot.Constants.RobotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
-import com.revrobotics.REVPhysicsSim;
 
-class SwerveModule {
+class SwerveModule implements Logged {
 
     private CANSparkMax driveMotor;
     private CANSparkMax turnMotor;
-
-    private SwerveModuleState swerveModuleState;
-
-    private SwerveModuleState simSwerveModuleState;
 
     private SparkPIDController driveMotorPID;
     private SparkPIDController turnMotorPID;
@@ -48,8 +41,6 @@ class SwerveModule {
     private DCMotorSim turnSimMotor;
 
     private SimpleMotorFeedforward driveSimFF;
-
-    private SimpleMotorFeedforward turnSimFF;
 
     private PIDController driveSimPID;
 
@@ -60,7 +51,7 @@ class SwerveModule {
     @Log
     private double driveVelocity;
     @Log
-    private double turnVelocity;
+    private Rotation2d turnPosition;
     @Log
     private double driveCurrent;
     @Log
@@ -72,14 +63,14 @@ class SwerveModule {
     @Log
     private double driveSetpoint;
     @Log
-    private double turnSetpoint;
+    private Rotation2d turnSetpoint;
 
-    public SwerveModule(Boolean isreal, int drivePort, int turnPort) {
+    public SwerveModule(boolean isReal, int drivePort, int turnPort) {
         this.isReal = isReal;
-        if (isreal) {
+        turnSetpoint = new Rotation2d(0);
+        if (isReal) {
             driveMotor = new CANSparkMax(drivePort, MotorType.kBrushless);
             turnMotor = new CANSparkMax(turnPort, MotorType.kBrushless);
-            swerveModuleState = new SwerveModuleState();
 
             driveMotorPID = driveMotor.getPIDController();
             turnMotorPID = turnMotor.getPIDController();
@@ -92,101 +83,146 @@ class SwerveModule {
             turnMotorPID.setP(Constants.MotorDefinitions.turnMotor.P);
             turnMotorPID.setI(Constants.MotorDefinitions.turnMotor.I);
             turnMotorPID.setD(Constants.MotorDefinitions.turnMotor.D);
-            turnMotorPID.setFF(Constants.MotorDefinitions.turnMotor.FF);
+
+            turnMotorPID.setPositionPIDWrappingEnabled(true);
+            turnMotorPID.setPositionPIDWrappingMaxInput(2 * Math.PI);
+            turnMotorPID.setPositionPIDWrappingMinInput(0);
+            
         } else {
             driveSimMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
             turnSimMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 1);
 
-            simSwerveModuleState = new SwerveModuleState();
-
             driveSimFF = new SimpleMotorFeedforward(0.0, 0.0021);
-            turnSimFF = new SimpleMotorFeedforward(0.0, 0.0021);
 
             driveSimPID = new PIDController(0.08, 0.0, 0.00);
             turnSimPID = new PIDController(0.08, 0.0, 0.00);
 
+            turnSimPID.enableContinuousInput(0, 2 * Math.PI);
+        }
+    }
+
+
+    public void periodic() {
+        if(isReal){
+            driveMotorPID.setReference(driveSetpoint, ControlType.kVelocity);
+            turnMotorPID.setReference(turnSetpoint.getRadians(), ControlType.kPosition);
+        }
+        else{
+            driveCurrent = driveSimMotor.getCurrentDrawAmps();
+            driveVelocity = driveSimMotor.getAngularVelocityRPM() * PIDConstants.WHEEL_CIRCUMFERENCE.in(Meters) * PIDConstants.DRIVE_GEARING;
+
+            turnPosition = Rotation2d.fromRadians(turnSimMotor.getAngularPositionRad());
+            turnCurrent = turnSimMotor.getCurrentDrawAmps();
+
+            driveAppliedVoltage = driveSimPID.calculate(driveVelocity, driveSetpoint)
+                    + driveSimFF.calculate(driveSetpoint);
+
+            turnAppliedVoltage = turnSimPID.calculate(turnPosition.getRadians(), turnSetpoint.getRadians());
+
+            driveSimMotor.setInputVoltage(driveAppliedVoltage);
+            turnSimMotor.setInputVoltage(turnAppliedVoltage);
         }
     }
 
     public void setState(SwerveModuleState state) {
-        if(isReal){
+        state = SwerveModuleState.optimize(state, turnPosition);
+        turnSetpoint = state.angle;
+        driveSetpoint = state.speedMetersPerSecond * Math.cos(turnSetpoint.getRadians() - turnPosition.getRadians());
 
-       
-        swerveModuleState = state;
-
-        driveMotorPID.setReference(state.speedMetersPerSecond, ControlType.kVelocity);
-        turnMotorPID.setReference(state.angle.getDegrees() / 360, ControlType.kPosition);
- }
-        else{
-        swerveModuleState = state;
-
-        driveCurrent = driveSimMotor.getCurrentDrawAmps();
-        driveVelocity = driveSimMotor.getAngularVelocityRPM();
-
-        turnVelocity = turnSimMotor.getAngularVelocityRPM();
-        turnCurrent = turnSimMotor.getCurrentDrawAmps();
-
-        driveAppliedVoltage = driveSimPID.calculate(driveVelocity, state.speedMetersPerSecond)
-                + driveSimFF.calculate(state.speedMetersPerSecond);
-        turnAppliedVoltage = turnSimPID.calculate(turnVelocity, state.speedMetersPerSecond)
-                + turnSimFF.calculate(state.speedMetersPerSecond);
-
-        driveSimMotor.setInputVoltage(driveAppliedVoltage);
-        turnSimMotor.setInputVoltage(turnAppliedVoltage);
-        
-        }
     }
 
-    public SwerveModuleState SwerveState() {
-        return swerveModuleState;
-
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(driveVelocity, turnPosition);
     }
 }
 
 public class Swerve extends SubsystemBase implements Logged {
 
-    private SwerveModule FLModule;
-    private SwerveModule FRModule;
-    private SwerveModule BLModule;
-    private SwerveModule BRModule;
+    private SwerveModule[] modules;
 
-    private Translation2d FLMotorLocation;
-    private Translation2d FRMotorLocation;
-    private Translation2d BLMotorLocation;
-    private Translation2d BRMotorLocation;
+    private SimGyro simGyro;
+
+    private final boolean isReal;
 
     SwerveDriveKinematics kinematics;
 
     public Swerve(boolean isReal) {
+        simGyro = new SimGyro(this);
+        this.isReal = isReal;
 
-        FLModule = new SwerveModule(isReal, MotorConstants.FRONT_LEFT_DRIVE, MotorConstants.FRONT_LEFT_TURN);
-        FRModule = new SwerveModule(isReal, MotorConstants.FRONT_RIGHT_DRIVE, MotorConstants.FRONT_RIGHT_TURN);
-        BLModule = new SwerveModule(isReal, MotorConstants.BACK_LEFT_DRIVE, MotorConstants.BACK_LEFT_TURN);
-        BRModule = new SwerveModule(isReal, MotorConstants.BACK_RIGHT_DRIVE, MotorConstants.BACK_RIGHT_TURN);
-        FLMotorLocation = new Translation2d(RobotConstants.ROBOT_LENGTH.divide(2),
-                RobotConstants.ROBOT_WIDTH.divide(2));
-        FRMotorLocation = new Translation2d(RobotConstants.ROBOT_LENGTH.divide(2),
-                RobotConstants.ROBOT_WIDTH.divide(-2));
-        BLMotorLocation = new Translation2d(RobotConstants.ROBOT_LENGTH.divide(-2),
-                RobotConstants.ROBOT_WIDTH.divide(2));
-        BRMotorLocation = new Translation2d(RobotConstants.ROBOT_LENGTH.divide(-2),
-                RobotConstants.ROBOT_WIDTH.divide(-2));
+        modules = new SwerveModule[4];
 
-        kinematics = new SwerveDriveKinematics(
-                FLMotorLocation,
-                FRMotorLocation,
-                BLMotorLocation,
-                BRMotorLocation);
+        modules[0] = new SwerveModule(isReal, MotorConstants.FRONT_LEFT_DRIVE, MotorConstants.FRONT_LEFT_TURN);
+        modules[1] = new SwerveModule(isReal, MotorConstants.FRONT_RIGHT_DRIVE, MotorConstants.FRONT_RIGHT_TURN);
+        modules[2] = new SwerveModule(isReal, MotorConstants.BACK_LEFT_DRIVE, MotorConstants.BACK_LEFT_TURN);
+        modules[3] = new SwerveModule(isReal, MotorConstants.BACK_RIGHT_DRIVE, MotorConstants.BACK_RIGHT_TURN);
 
     }
 
-    public void setChassisSpeed(ChassisSpeeds Velocity) {
-        SwerveModuleState[] stateVelocity = kinematics.toSwerveModuleStates(Velocity);
 
-        FLModule.setState(stateVelocity[0]);
-        FRModule.setState(stateVelocity[1]);
-        BLModule.setState(stateVelocity[2]);
-        BRModule.setState(stateVelocity[3]);
+    @Override
+    public void periodic() {
+        modules[0].periodic();
+        modules[1].periodic();
+        modules[2].periodic();
+        modules[3].periodic();
+
+        if (!isReal) {
+            simGyro.update();
+        }
     }
 
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+        speeds = ChassisSpeeds.discretize(speeds, 0.02);
+
+        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, RobotConstants.MAX_LINEAR_SPEED);
+
+        modules[0].setState(states[0]);
+        modules[1].setState(states[1]);
+        modules[2].setState(states[2]);
+        modules[3].setState(states[3]);
+    }
+    
+    @Log
+    public SwerveModuleState[] getModuleStates() {
+        return new SwerveModuleState[] {
+            modules[0].getState(),
+            modules[1].getState(),
+            modules[2].getState(),
+            modules[3].getState()
+        };
+    }
+
+    public Rotation2d getGyroAngle() {
+        return isReal ? new Rotation2d() : simGyro.getAngle();
+    }
 }
+
+class SimGyro implements Logged {
+    private final Swerve swerve;
+
+    @Log
+    private double angle;
+
+    public SimGyro(Swerve swerve) {
+        this.swerve = swerve;
+
+        angle = 0;
+    }
+
+    public void update() {
+        ChassisSpeeds speeds = PIDConstants.kinematics.toChassisSpeeds(swerve.getModuleStates());
+
+        angle += speeds.omegaRadiansPerSecond * 0.02;
+    }
+
+    public Rotation2d getAngle() {
+        return Rotation2d.fromRadians(angle);
+    }
+    
+    
+}
+
+
