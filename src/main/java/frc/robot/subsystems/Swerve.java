@@ -147,7 +147,7 @@ public class Swerve extends SubsystemBase implements Logged {
     SwerveDriveKinematics kinematics;
 
     public Swerve(boolean isReal) {
-        simGyro = new SimGyro(this);
+        simGyro = new SimGyro();
         this.isReal = isReal;
 
         modules = new SwerveModule[4];
@@ -168,7 +168,7 @@ public class Swerve extends SubsystemBase implements Logged {
         modules[3].periodic();
 
         if (!isReal) {
-            simGyro.update();
+            simGyro.update(this.getModuleStates());
         }
     }
 
@@ -201,19 +201,15 @@ public class Swerve extends SubsystemBase implements Logged {
 }
 
 class SimGyro implements Logged {
-    private final Swerve swerve;
-
     @Log
     private double angle;
 
-    public SimGyro(Swerve swerve) {
-        this.swerve = swerve;
-
+    public SimGyro() {
         angle = 0;
     }
 
-    public void update() {
-        ChassisSpeeds speeds = PIDConstants.kinematics.toChassisSpeeds(swerve.getModuleStates());
+    public void update(SwerveModuleState[] states) {
+        ChassisSpeeds speeds = PIDConstants.kinematics.toChassisSpeeds(states);
 
         angle += speeds.omegaRadiansPerSecond * 0.02;
     }
@@ -221,8 +217,6 @@ class SimGyro implements Logged {
     public Rotation2d getAngle() {
         return Rotation2d.fromRadians(angle);
     }
-    
-    
 }
 
 

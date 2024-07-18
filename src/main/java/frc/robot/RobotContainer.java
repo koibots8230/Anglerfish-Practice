@@ -37,18 +37,21 @@ public class RobotContainer implements Logged {
 
                 intakeCommand = new IntakeCommand(indexerSubsystem, intakeSubsystem);
                 
-
-                Monologue.setupMonologue(
-                                this, "Robot", Constants.LoggerConstants.FILEONLY,
-                                Constants.LoggerConstants.LAZYLOGGING);
-                
                 swerveSubsystem.setDefaultCommand(new SwerveCommand(
                         () -> controller.CONTROLLER.getLeftX(),
                         () -> controller.CONTROLLER.getLeftY(), 
                         () -> controller.CONTROLLER.getRightX(), 
                         swerveSubsystem));
 
+                Monologue.setupMonologue(
+                                this, "Robot", Constants.LoggerConstants.FILEONLY,
+                                Constants.LoggerConstants.LAZYLOGGING);
+
                 configureBindings();
+        }
+
+        public void updateLogs() {
+            Monologue.updateAll();
         }
 
         private void configureBindings() {
